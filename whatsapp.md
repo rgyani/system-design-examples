@@ -153,4 +153,4 @@ num_servers_reqd = (num_chat_msgs_per_second * latency) / num_concurrent_connect
 Let’s assume that the number of concurrent connections per server is 100K, and the latency of sending a message is 20 milliseconds. In such a scenario, the estimated number of servers required in the chat servers’ fleet (using the equation mentioned above) will be 8 (i.e., 40 Million*20 ms/100K). In standard practice, it’s recommended to add a few more servers to account for handling failures of these servers. 
 
 
-FUN FACT: In this [talk](https://vimeo.com/44312354), Rick Reed(software engineer @ WhatsApp) talks about optimizing their Erlang-based server applications and tuning the FreeBSD kernel to support millions of concurrent connections per server. This helped them to a great extent in keeping their server footprint as small as possible.
+***NOTE***: In this [talk](https://vimeo.com/44312354), Rick Reed(software engineer @ WhatsApp) talks about optimizing their Erlang-based server applications and tuning the FreeBSD kernel to support millions of concurrent connections per server. This helped them to a great extent in keeping their server footprint as small as possible.
