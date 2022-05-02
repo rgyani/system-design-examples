@@ -22,7 +22,7 @@ Then and only then should you go deeper into the details.
 
 For a good System Design you need to first define the following before drawing any boxes
 
-1. Features:      Minimum features you must have
+1. Features:      Minimum features you must have: Functional Requirements
 2. APIs:          The required APIs, who is going to call them, how they are going to call them
 3. Availability:  Decide how HA you want our system to be, with regard to Consistency And Scalability
 4. Scalability:   Make sure your system that works for 1000 users, does also work for a million users
