@@ -71,3 +71,6 @@ The Home Page service queries this database behind a load balancer.
 
 Kafka Again acts as a Service Bus, connecting the Ingestion Service with the Movies master NoSQL Database acting as a consumer
 The Users activity also goes into the Kafka SOA, and can be picked by Spark Analytics Pipeline
+
+
+![img](imgs/Netflix.png)
