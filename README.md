@@ -43,6 +43,6 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design Uber](uber.md)
 * [Design Netflix](netflix.md)
 * [Design Google Drive](google-drive.md)
-* [Design Payment System](payments.md)
-* [Design Tickets System](tickets.md)
+* [Design Payment System](https://newsletter.pragmaticengineer.com/p/designing-a-payment-system?s=r)
+* [Design Hotel Booking System](hotel-booking.md)
 * [Design Stock Exchange](stock-exchange.md)
