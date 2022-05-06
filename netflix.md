@@ -49,3 +49,25 @@ Also, if we receive some errors on the User Device, regarding video playback, th
 Video viewing patterns will be sent to another kafka topic, and Spark could be used for building ML recommendation systems.
 Similarly, Most watched titles could be created using viewing patterns.
 
+
+### Search Service
+
+The Users should be able to Search for Movies, Actors etc and be able to perform Fuzzy Searches  
+A fuzzy search is a process that locates Web pages that are likely to be relevant to a search argument even when the argument does not exactly correspond to the desired information.   
+
+For scenarios like this, ElasticSearch is the industry standard.  
+
+While Ingesting Content, the metadata information, can be sent to a Kafka Cluster, which can have a Consumer updating our ElasticSearch clster
+
+A Search Service interfacing with this ElasticSearch can be invoked by the user, behind a load balancer
+
+### Home Page Service
+
+We could have a NoSQL database(Cassandra) containing all the Titles Available, and a SQL database(or Redis cluster) generating Home Page periodically based on User Classifications
+
+The Home Page service queries this database behind a load balancer.
+
+
+
+Kafka Again acts as a Service Bus, connecting the Ingestion Service with the Movies master NoSQL Database acting as a consumer
+The Users activity also goes into the Kafka SOA, and can be picked by Spark Analytics Pipeline
