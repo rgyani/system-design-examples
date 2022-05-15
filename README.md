@@ -1,3 +1,14 @@
+## Responsibilities of a Solution Architect
+
+Solution Architecture translates technical business needs into practical IT solutions while establishing rules and instructions for proper implementation and delivery.  
+It also considers all external factors that could have an impact on the development process.  
+This way, digital projects are less likely to fail and there is a consensus between EA teams and development teams.   
+SA can be seen as a support system that provides structure and reduces the scope of complexity when developing and rolling out new systems and applications.
+
+
+![img](imgs/SolutionArchitectResponsibility.PNG)
+
+
 ### System Design Examples
 
 Many systems design questions are intentionally left very vague and are literally given in the form of "Design Facebook".<br>
