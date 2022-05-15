@@ -23,7 +23,7 @@ Non-functional Requirements
 
 ### Scale
  
-Lets say, we want to provide for 500K, 10M rooms and  roughly 1000 Rooms/ Hotel
+Lets say, we want to provide for 500K hotels, 10M rooms and  roughly 1000 Rooms/ Hotel
 
 ### UI and flow for Hotel Management people to use
 
