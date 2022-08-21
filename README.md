@@ -58,3 +58,4 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design Hotel Booking System](hotel-booking.md)
 * [Design Stock Exchange](stock-exchange.md)
 * [Design Zoom](https://www.codekarle.com/system-design/Zoom-system-design.html)
+* [Atomic Counter](atomic-counter.md)
