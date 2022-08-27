@@ -76,6 +76,7 @@ $value.substring(1,$l)
 ### Deploy
 We are done with configuring the API. Now click on Deploy API, select a stage and it is ready to test.
 
+
 ## with REDIS
 
 The counter pattern is the most obvious thing you can do with Redis atomic increment operations. 
@@ -93,3 +94,66 @@ redis> GET mykey
 redis> 
 
 ```
+
+
+## More DynamoDB conditional Update Examples
+
+* The following example performs an UpdateItem operation. It tries to reduce the Price of a product by 75—but the condition expression prevents the update if the current Price is less than or equal to 500.
+
+```text
+aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '{"Id": {"N": "456"}}' \
+    --update-expression "SET Price = Price - :discount" \
+    --condition-expression "Price > :limit" \
+    --expression-attribute-values file://values.json
+```
+
+The arguments for --expression-attribute-values are stored in the values.json file.
+
+```
+{
+    ":discount": { "N": "75"},
+    ":limit": {"N": "500"}
+}
+```
+
+* The following example uses attribute_not_exists to delete a product only if it does not have a Price attribute.
+
+```
+aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '{"Id": {"N": "456"}}' \
+    --condition-expression "attribute_not_exists(Price)"
+```
+
+* DynamoDB also provides an attribute_exists function. The following example deletes a product only if it has received poor reviews.
+
+```
+aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '{"Id": {"N": "456"}}' \
+    --condition-expression "attribute_exists(ProductReviews.OneStar)"
+```
+
+* The following example uses attribute_type to delete a product only if it has a Color attribute of type String Set.
+
+```
+aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '{"Id": {"N": "456"}}' \
+    --condition-expression "attribute_type(Color, :v_sub)" \
+    --expression-attribute-values '{":v_sub":{"S":"SS"}}'
+```
+
+* The following example uses begins_with to delete a product only if the FrontView element of the Pictures map starts with a specific value.
+
+```
+aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '{"Id": {"N": "456"}}' \
+    --condition-expression "begins_with(Pictures.FrontView, :v_sub)" \
+    --expression-attribute-values '{ ":v_sub":{"S":"http://"} }`
+```
+
+
