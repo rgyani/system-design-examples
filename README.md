@@ -8,6 +8,10 @@ SA can be seen as a support system that provides structure and reduces the scope
 
 ![img](imgs/SolutionArchitectResponsibility.PNG)
 
+# Solution architect vs Enterprise Architect vs Technical Architect
+
+Nicely summarized here
+![img](imgs/solution_vs_technical_enterprise.jpeg)
 
 ### System Design Examples
 
