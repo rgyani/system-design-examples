@@ -28,7 +28,7 @@ Lets consider the pros and cons of both scenarios before honing in on one system
 For our use case 
 1. 10K daily active writers * 365 days * 10KB data per blog -> 34 GB of data per year
     a. This can be handled by SQL also, and we dont need joins here, so the data can be sharded and scaled up
-2. For searching, we would need to support fuzzy search, hence a separate ElasticSearch cluster is essential
+2. For searching, we would need to support fuzzy search, hence **a separate ElasticSearch cluster** is essential
 3. For lookups based on userid-post date combination, there is a simple Query operation on the DB
 4. However, when we want to list all the blogs of a writer, we need to do Scan operations.
    1. for this, in nosql DBs like DynamoDB, we can design the "posts" table, such that

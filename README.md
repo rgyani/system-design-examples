@@ -65,4 +65,3 @@ Here are some examples of how you can design the following systems, based on my 
 * [Atomic Counter](atomic-counter.md)
 * [Git Internals](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
 * [Design Blogging System](blogging-system.md)
-* 
