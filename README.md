@@ -67,3 +67,4 @@ Here are some examples of how you can design the following systems, based on my 
 * [Git Internals](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
 * [Design Blogging System](blogging-system.md)
 * [Design Realtime Leaderboard](leaderboard.md)
+* [Deploy a WordPress Website](https://github.com/acantril/learn-cantrill-io-labs/tree/master/aws-elastic-wordpress-evolution)
