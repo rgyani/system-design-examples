@@ -75,7 +75,7 @@ Redis supports many operations that can be done with sorted-sets. Since we requi
 3) User2
 ```
 
-####ZRANGE : Fetches all the items in the ZSET from their position in sorted order
+#### ZRANGE : Fetches all the items in the ZSET from their position in sorted order
 ```text
 127.0.0.1:6379> ZRANGE score 0 100 WITHSCORES
 1) User1
@@ -86,19 +86,19 @@ Redis supports many operations that can be done with sorted-sets. Since we requi
 6) 90
 ```
 
-###ZSCORE : Returns the score of the member in the ZSET
+### ZSCORE : Returns the score of the member in the ZSET
 ```text
 127.0.0.1:6379> ZSCORE score User1
 70
 ```
 
-###ZCOUNT : Returns the number of members with scores between the provided minimum and maximum in ZSET
+### ZCOUNT : Returns the number of members with scores between the provided minimum and maximum in ZSET
 ```text
 127.0.0.1:6379> ZCOUNT score -inf +inf
 3
 ```
 
-###ZRANK : Returns the position of the given member based on his score in ZSET
+### ZRANK : Returns the position of the given member based on his score in ZSET
 ```text
 127.0.0.1:6379> ZRANK score User1
 0
@@ -108,7 +108,7 @@ Redis supports many operations that can be done with sorted-sets. Since we requi
 1
 ```
 
-###ZINCRBY : Increments the score of a member in the ZSET
+### ZINCRBY : Increments the score of a member in the ZSET
 ```text
 127.0.0.1:6379> ZINCRBY score 10 User1 
 80
