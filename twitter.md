@@ -81,8 +81,5 @@ For Search, we can use Lucene based systems like Elastic Search
 ### Further Reading
 
 * [How Twitter Uses Redis To Scale - 105TB RAM, 39MM QPS, 10,000+ Instances](http://highscalability.com/blog/2014/9/8/how-twitter-uses-redis-to-scale-105tb-ram-39mm-qps-10000-ins.html)
-* [The Engineering Behind Twitter’s New Search Experience
-  ](https://blog.twitter.com/engineering/en_us/a/2011/the-engineering-behind-twitter-s-new-search-experience.html)  
-
-
-
+* [The Engineering Behind Twitter’s New Search Experience](https://blog.twitter.com/engineering/en_us/a/2011/the-engineering-behind-twitter-s-new-search-experience.html)  
+* [Decoding  X's (Twitter) ALGORITHM](https://twitter.com/javilopen/status/1717284652661297319)
