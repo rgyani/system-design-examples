@@ -11,8 +11,8 @@ Functional Requirements
 4. a user can be both - a reader as well as a writer
 5. The blog may contain text, images, videos
 6. The writer/reader can see the blogs published for a user
-7. Draft etc can be out-of-score for now (but can be easily handled via a DB flag down the line, same for deletion/unpublish)
-8. Comments are out of scope for now but will be good to discuss
+7. Draft etc can be out-of-scope for now (but can be easily handled via a DB flag down the line, same for deletion/unpublish)
+8. Comments are out-of-scope for now but will be good to discuss
 
 Non-functional Requirements
 1. Minimum latency
@@ -43,7 +43,7 @@ I would bat for dynamoDB here, because of
 2. Schemaless: with sql database the schema has to be predetermined before implementation
 
 ##### eg. the videos column:  
-Obviously,  videos and images would be stored in a CDN (cloudfront services by a s3 bucket eg)    
+Obviously,  videos and images would be stored in a CDN (eg. cloudfront in-front of a s3 bucket)    
 However we might want to serve multi-resolution videos, based the reader device down the line.  
 For this we can simply add columns to the post table and the right columns containing the video location can be picked up by our api
 
