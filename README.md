@@ -59,6 +59,7 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design Google Docs](google-docs.md)
 * [Design Uber](uber.md)
 * [Design Netflix](netflix.md)
+* [Design Ticket Booking with Virtual Waiting Rooms](virtual-waiting-room.md)
 * [Design Payment System](https://newsletter.pragmaticengineer.com/p/designing-a-payment-system?s=r)
 * [Design Hotel Booking System](hotel-booking.md)
 * [Design Stock Exchange](stock-exchange.md)
