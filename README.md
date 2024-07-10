@@ -69,3 +69,4 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design Blogging System](blogging-system.md)
 * [Design Realtime Leaderboard](leaderboard.md)
 * [Deploy a WordPress Website](https://github.com/acantril/learn-cantrill-io-labs/tree/master/aws-elastic-wordpress-evolution)
+* [Use Cognito to validate user-permissions on resources](cognito-roles.md)
