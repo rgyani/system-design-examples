@@ -188,7 +188,7 @@ When you configure API Gateway to use a Cognito User Pool Authorizer, API Gatewa
 
 
 ### My request still reached all the way to the lambda, can I not stop this lambda invocation
-While you correct, I dont see any hole in the design in terms of security, the other ways to avoid this is even more complicated, lets discuss it just to round up
+While you're correct, I dont see any hole in the design in terms of security, the other ways to avoid this is even more complicated, lets discuss it just to round up
 
 We can always create a custom lambda authorizer that validates the JWT token and checks the specific custom claims, like so
 
