@@ -132,7 +132,7 @@ The user object returned on successful authentication typically looks something 
     "sub": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
     "email_verified": true,
     "email": "user@example.com",
-    "custom:favorite_color": "blue"
+    "custom:service_permissions": "NNNR"
   },
   "preferredMFA": "NOMFA"
 }
