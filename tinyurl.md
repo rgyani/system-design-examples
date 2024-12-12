@@ -64,6 +64,13 @@ However, in case of a multi-node cluster, we could have a race condition, where 
 
 3. Generating a random String for each URL, and/or appending Timestamp don't guarantee that the same input URL will give the same shortened URL and hence not being discussed here.
 
+### Zookeeper Leader Election
+* A simple way of doing leader election with ZooKeeper is to use the **SEQUENCE|EPHEMERAL** flags when creating znodes that represent "proposals" of clients.  
+* The idea is to have a znode, say "/election", such that each znode creates a child znode "/election/{guid}-n_" with both flags SEQUENCE|EPHEMERAL.  
+* With the sequence flag, ZooKeeper automatically appends a sequence number that is greater than anyone previously appended to a child of "/election".  
+* The process that created the znode with the smallest appended sequence number is the leader.
+
+
 ### Cache
 
 Our service should be able to cache URLs that are frequently accessed, through a solution like Memcached
@@ -77,3 +84,5 @@ For Database Scalability, we would have NoSQL databases like Cassandra, or Dynam
 These databases, use hash-based partitioning, which takes hash of the object being stored and then calculate which partition to use. The hashing function will randomly distribute the data into different partitions, hence there will not be any problem of hot-regions
 
 ![img](imgs/tinyurl.svg)
+
+
