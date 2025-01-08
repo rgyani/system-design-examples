@@ -32,20 +32,21 @@ For our use case
 3. For lookups based on userid-post date combination, there is a simple Query operation on the DB
 4. However, when we want to list all the blogs of a writer, we need to do Scan operations.
    1. for this, in nosql DBs like DynamoDB, we can design the "posts" table, such that
-      a. UserId is the primary key, and DatePublished is a sort key
+      * UserId is the primary key, and 
+      * DatePublished is a sort key
    2. In SQL databases, we can have the "posts" table containing userid(FK), post_date, and content such that
-      a. we can simply query over the posts table with userid in where clause.
-      b. remember to add an index over the userid column in post table to improve query performance
-      c. obviously with the scale of data we are talking about the performance of the index might be a constraint on the performance
+      * we can simply query over the posts table with userid in where clause.
+      * remember to add an index over the userid column in post table to improve query performance
+      * obviously with the scale of data we are talking about the performance of the index might be a constraint on the performance
 
 I would bat for dynamoDB here, because of  
 1. the sheer flexibility of guaranteed constant performance even if the scale of data massively increases
-2. Schemaless: with sql database the schema has to be predetermined before implementation
-
-##### eg. the videos column:  
-Obviously,  videos and images would be stored in a CDN (eg. cloudfront in-front of a s3 bucket)    
-However we might want to serve multi-resolution videos, based the reader device down the line.  
-For this we can simply add columns to the post table and the right columns containing the video location can be picked up by our api
+2. Schemaless: with sql database the schema has to be predetermined before implementation, eg  
+   1. the videos column:  
+      * Obviously,  videos and images would be stored in a CDN (eg. cloudfront in-front of a s3 bucket)    
+      *  However we might want to serve multi-resolution videos, based the reader device down the line.  
+      * For this we can simply add columns to the post table and the right columns containing the video location can be picked up by our api
+      * suppose tomorrow, we also support nintendo switch 2, then we could run a slow-processor on the videos and add a new column for the switch resolution
 
 
 # APIs
