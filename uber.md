@@ -27,22 +27,23 @@ The same concepts for route planning and ETA will be used here.
 
 Lets have a look at how customers and drivers interact with the system.
 
-* All Users will interact with the system via a user app which talks to the user service. User service ses a SQL DB at the backend and stores all user related information (name, ratings, billing info etc )
-* All drivers also similarly interact with a SQL DB containing driver information via a driver service. 
-* All the drivers' current location is also periodically send to the system (when on duty) and sent to a In-Memory Cache (Redis) where the primary key is the Geohash. This is achieved via WebSockets over a LocationService
+* All Users will interact with the system via a user app which talks to the user service. User service ses a **SQL DB** at the backend and stores all user related information (name, ratings, billing info etc )
+* All drivers also similarly interact with another *SQL DB* containing driver information via a driver service. 
+* All the drivers' current location is also periodically send to the system (when on duty) and sent to a **In-Memory Cache (Redis)** where the **primary key is the Geohash (with TTL)**. This is achieved via WebSockets over a LocationService
 
-When a user starts a booking process, his location is sent to the CabRequest Service, which send the data to a kaka topic.   
-A CabFinder service is reading from this kafka topic (to make is scalable), it takes the booking request and tries to find the nearest available drivers based on Geohash.    
-This query can first start in the current geohash and then expand to adjoining geohashes to find available drivers.
-The CabRequest service also starts a WebSockets connection with the user's app and periodically sends available driver locations to the app for the user to see and ETA is shown.
+When a user starts a booking process, 
+- his location is sent to the CabRequest Service, which send the data to a **kaka topic**.   
+- A CabFinder service is reading from this kafka topic (to make it scalable), it takes the booking request and tries to find the nearest available drivers based on Geohash.    
+- **This query can first start in the current geohash and then expand to adjoining geohashes to find available drivers.**  
+- The CabRequest service also starts a **WebSockets connection** with the user's app and periodically sends available driver locations to the app for the user to see and ETA is shown.
 
 When the CabFinder service, find one or more available drivers, the request is sent to the drivers or them to accept.
-Here we must use DB transactions or Zookeeper election mechanism to ensure that only one driver is able to accept the request.
+Here we must use **DB transactions or Zookeeper election mechanism** to ensure that only one driver is able to accept the request.
 
 Once the driver has accepted the request, we send the details to the Trip Service, which tracks the ETA and the start of trip.
 For safety reasons, the user can also be sent an OTP which he has to provide to the driver to Start/Stop the trip.
 
-The Trip Service keeps updating a Kafka Cluster with periodic location for analytical purposes.
+The Trip Service keeps updating a **Kafka Cluster** with periodic location for analytical purposes.
 Once the trip completed the information is sent to a Payment service to make the necessary monetary adjustments. 
 
 ### Analytics

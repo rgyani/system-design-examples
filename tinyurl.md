@@ -25,7 +25,7 @@ Considering Twitter has 300 million users per month, assuming our service become
 Lets say we want to keep our service for 5 years, we will store 300M * 12 * 5 = ~20 billion requests
 
 We will be serving out 300 million/(30 days * 24 hours * 3600 seconds)  = ~200 shortening requests/sec
-Considering the 100:1 read/write ratio, the redirection requests will be ~ 20K requests/sec
+Considering the 100:1 read/write ratio, the redirection requests will be ~ 20,000 requests/sec
 
 ##### URL Length
 
@@ -61,7 +61,7 @@ In case of collision, we could right shift and try again.
 
 However, in case of a multi-node cluster, we could have a race condition, where two different nodes try to write the same key for different URLs.
 1. We could use Zookeeper for coordination between the instances, such that the key becomes an ephemeral node, and which-ever instance creates the node gets to write to DB, and the other one regenerates the key and tries again.
-
+2. Or if we are using DybamoDB, we can simply use conditional writes, eg ConditionExpression: "attribute_not_exists(Status)
 3. Generating a random String for each URL, and/or appending Timestamp don't guarantee that the same input URL will give the same shortened URL and hence not being discussed here.
 
 ### Zookeeper Leader Election
@@ -73,14 +73,14 @@ However, in case of a multi-node cluster, we could have a race condition, where 
 
 ### Cache
 
-Our service should be able to cache URLs that are frequently accessed, through a solution like Memcached
+Our service should be able to cache URLs that are frequently accessed, through a solution like Memcached/Redis
 Because we want to replace a link with a more popular URL, we can use the Least Recently Used (LRU) policy for our cache system.
 
 
 ### Scalability
 
 We will ideally have multiple servers generating the short URLs for us. These can be placed behind a load balancer.
-For Database Scalability, we would have NoSQL databases like Cassandra, or DynamoDB which are horizontally scalable.
+For Database Scalability, we would have NoSQL databases like Cassandra or DynamoDB which are horizontally scalable.
 These databases, use hash-based partitioning, which takes hash of the object being stored and then calculate which partition to use. The hashing function will randomly distribute the data into different partitions, hence there will not be any problem of hot-regions
 
 ![img](imgs/tinyurl.svg)

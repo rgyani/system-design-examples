@@ -33,9 +33,9 @@ Thus **a relational database is not a good choice for real-time leaderboard**
 
 # Redis to Rescue
 
-Redis is an in-memory structure store. It provides speed in a high load environment that is impossible to achieve through relational databases. Moreover, it’s unique data structures can be utilized to perform amazing tasks, and **we will be using it’s sorted set** to build a highly efficient and scalable leaderboard.
+Redis is an in-memory structure store. It provides speed in a high load environment that is impossible to achieve through relational databases. Moreover, it’s unique data structures can be utilized to perform amazing tasks, and **we will be using its sorted set** to build a highly efficient and scalable leaderboard.
 
-### Sorted set data structure of Redis
+### Sorted set(ZSET) data structure of Redis
 
 Redis Sorted Sets are, similarly to Redis Sets, non repeating collections of Strings. The difference is that **every member of a Sorted Set is associated with score, that is used in order to take the sorted set ordered**, from the smallest to the greatest score. While members are unique, scores may be repeated.
 
@@ -129,6 +129,30 @@ Redis supports many operations that can be done with sorted-sets. Since we requi
 We obviously, at the minimum need an API Gateway in front of a lambda, which interacts with the Redis as well as a persistent database to store the scores as depicted above
 
 
+# Understanding SortedSet implementation in Redis
+In Redis, sorted sets are implemented using a combination of a **hash table** and a **skip list** data structure. The hash table provides fast access to elements based on their value, while the skip list maintains the sorted order of the elements based on their scores. This dual structure allows Redis to efficiently perform operations on sorted sets.
+
+### Understand the Skiplist Concept
+
+While balanced trees like AVL or Red-Black trees also provide O(log n) performance, skiplists are simpler to implement and tune, and their probabilistic nature is well-suited for scenarios like Redis, where constant-time amortized performance is often good enough.  
+Skiplist is particularly effective in memory-constrained environments due to its relatively simple structure and predictable performance characteristics. Redis takes advantage of these features to handle billions of sorted set operations efficiently.
 
 
+Think of a skiplist as multiple linked lists stacked on top of each other:
+* **Bottom list**: This is the full sorted list of elements.
+* **Upper lists**: Each level "skips" some elements from the level below, helping us jump closer to the target element faster.  
+Each element appears in **at least one level**, but some may appear in more levels (randomly decided).
 
+![alt text](imgs/SkipList1.jpg)
+
+A skiplist node will store:
+* Value (key): The data or key you’re storing.
+* Score: A number (like in Redis) used for sorting.
+* Pointers: References to the next node at the same level and the node below.
+
+A skiplist structure will:
+* Keep track of the head node for all levels.
+* Allow operations like search, insert, and delete.
+
+To better understand the concept, read here  
+https://jothipn.github.io/2023/04/07/redis-sorted-set.html#determining-the-random-level

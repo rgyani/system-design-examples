@@ -34,7 +34,7 @@ It is obvious that we need a read-heavy system, and the table design should have
 ![img](imgs/twitter_DB.svg)
 
 * Users Table: Which stores the info about the users in the system
-* Tweets Table: Which stores the tweets done against the user ID
+* Tweets Table: Which stores the tweets by the user, against the user ID
 * Followed Table: Which stored the other users this user follows
 * FollowedBy Table: This is an auxilary table, which can quickly show which users follow this particular user for display only
 
@@ -43,8 +43,9 @@ It is obvious that we need a read-heavy system, and the table design should have
 * For each tweet, an entry is made in the Tweets Table, and for each like a corresponding entry is made into the Likes table.
 
 
-So now to build the User's Personal timeline, a simple Query over the Tweets table in reverse chronological order would suffice.<br>
-However to build the User's Home timeline, we would need to first fetch all the users this user is following, and then fetch tweets from the global tweets table for this user list. This obviously has the drawback of NOT BEING SCALABLE, despite tricks like sharding, caching etc.
+So now to build the User's Personal timeline, a simple Query over the Tweets table in reverse chronological order would suffice.  
+
+**However to build the User's Home timeline, we would need to first fetch all the users this user is following, and then fetch tweets from the global tweets table for this user list. This obviously has the drawback of NOT BEING SCALABLE, despite tricks like sharding, caching etc.**
 
 A solution to the above problem is, while submitting a tweet, we fanout the processing, such that when a tweet arrives, we can find out which are the **ACTIVE** followers in the system and then for these users, the cache for these users can be updated to store the tweet. The write also happen to database and multiple caches will also be updated only for the active users.
 
@@ -60,7 +61,7 @@ A simple flow of tweet looks like,
 However, if you consider the case of celebrities, they will have millions of followers.<br>
 Here injecting each tweet into the followers timelines would take a lot of processing and will not good latency wise<br>
 So, we can
-* Precomputed home timeline of "User A" with everyone except celebrity tweet(s)
+* Precomputed home timeline of "User A" **with everyone except celebrity tweet(s)**
 * When User A access his timeline his tweet feed is merged with celebrity tweet at load time.
 * For every user have the mapping of celebrities list and mix their tweets at runtime when the request arrives and cache it.
 
