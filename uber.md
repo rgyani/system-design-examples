@@ -53,3 +53,5 @@ This can be used for
 1. analyzing hotspots or areas with scarcity of drivers.
 2. Driver profiling, User profiling (further linked to coupons etc)
 3. Fraud detection etc.
+
+![alt text](imgs/m2m-kafka.drawio.png)
