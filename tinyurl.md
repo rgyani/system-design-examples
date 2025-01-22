@@ -86,3 +86,48 @@ These databases, use hash-based partitioning, which takes hash of the object bei
 ![img](imgs/tinyurl.svg)
 
 
+### Expiry
+Say, we leverage DynamoDB as the key-value store for storing both complete_url-to-short_url and short_url-to-complete_url.  
+We can create 
+1. a TALL Single-Table Design with TTL  
+
+| PK (Partition Key) | SK(Sort Key) | URL |	ShortLink |	ExpiryTimestamp |
+|---|---|---|---|---|
+| SHORT#<short_link> | METADATA | <long_url> | <short_url> | expiry |
+| URL#<long_url> |	METADATA | <long_url> |	<short_url> | expiry |
+
+2. A WIDE Single-Table Design with GSI
+
+| short_link (PK) | url(SK) | ExpiryTimestamp |
+|---|---|---|
+| <short_link> | <long_url> | expiry |
+
+And create a GSI, with pk: url and sk: short_link
+
+In both cases we should mark ExpiryTimestamp attribute as TTL specification
+```
+aws dynamodb update-time-to-live \
+  --table-name your_table_name \
+  --time-to-live-specification "Enabled=true, AttributeName=ExpiryTimestamp"
+```
+
+However in both cases, if we want URLs to expire based on the last access time,
+we need to update the ExpiryTimeStamp to current_time + 6 months (or expiry duration) for each access.
+```
+from datetime import datetime, timedelta
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('shortlink-to-url')
+
+# Example: Set TTL to 6 months from now
+expiry_time = int((datetime.utcnow() + timedelta(days=180)).timestamp())
+table.put_item(
+    Item={
+        'short_link': 'abc123',
+        'url': 'https://example.com',
+        'expiry_timestamp': expiry_time
+    }
+)
+```
+
