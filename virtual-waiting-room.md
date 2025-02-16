@@ -75,3 +75,57 @@ Some considerations
 * The 10,000 limit also benefits from burst capacity – up to 5,000 additional RPS – in peak demand moments. However, AWS does not take any hard commitments, and developers can’t control or predict how the burst capacity will be allocated.
 * ALB, on the other hand, is virtually unlimited. AWS specifies no limits in terms of connections per second or concurrently in the service quotas page. It can easily scale to handle +100,000’s RPS in a second and, in principle, could go beyond millions of RPS as well at these levels
 * It is probably a good idea to pre-warm the Load Balancer with the help from the AWS support team, as well as to conduct stress tests and make sure the architecture is well optimized for the load.
+
+### AWS API Gateway (REST vs HTTP)
+
+1. **REST API (10,000 RPS Limit)**  
+The REST API type in API Gateway is the older, feature-rich option that includes many built-in capabilities:
+
+#### Why REST APIs Have a Lower RPS?
+- More Overhead
+    - REST APIs support authentication (IAM, Cognito, Lambda Authorizers), request validation, transformations, logging, and integrations with various AWS services.
+    - Each request undergoes multiple processing steps, increasing latency and reducing scalability.
+- Built-in Features
+    - API Keys & Usage Plans → Rate limiting per client.
+    - Stage Variables → Configuration management for different environments.
+    - Integration with AWS X-Ray → Adds tracing overhead.
+- More Expensive and Heavier Processing
+    -   REST APIs use a regional endpoint model, meaning they must handle the entire request lifecycle, including transformations and security checks.
+
+#### Best Use Cases for REST APIs
+- Applications requiring fine-grained request processing.
+- APIs needing authentication, transformation, logging, and monitoring.
+- Serverless applications using AWS Lambda.
+- Multi-tenancy support with API Keys & usage plans.
+
+2. **HTTP API (100,000 RPS Limit)**  
+AWS introduced HTTP APIs as a lightweight, high-performance alternative to REST APIs.
+
+#### Why HTTP APIs Have a Higher RPS?
+- Lower Overhead
+    - HTTP APIs strip down many of the advanced REST API features (e.g., request validation, stage variables, API Keys) for better performance.
+    - They provide only essential features like JWT-based authentication (Cognito) and direct AWS service integrations.
+- Simplified Routing & Execution
+    - HTTP APIs are optimized for direct integrations with Lambda, ALB, and other HTTP backends.
+    - API Gateway doesn’t need to process as many steps per request.
+- Better Pricing & Scaling
+    - HTTP APIs are cheaper than REST APIs.
+    - They can handle 10x more RPS (100K vs. 10K) due to reduced processing.
+
+#### Best Use Cases for HTTP APIs
+- High-performance public APIs.
+- Applications that don’t require extensive request transformation or validation.
+- Simple microservices and event-driven architectures using Lambda.
+- ALB or direct HTTP backend integration.
+
+#### REST API vs. HTTP API Comparison
+| Feature | REST API | HTTP API |
+|---|---|---|
+| RPS Limit| 10,000| 100,000 |
+| Latency | Higher | Lower |
+| Authentication | IAM, Cognito, Lambda Authorizers	| JWT (Cognito) |
+| Request Transformation | ✅ Supported | ❌ Not Supported |
+| Rate Limiting |	✅ Usage plans |	❌ No built-in per-user limits |
+| Direct ALB Integration |❌ No |	✅ Yes |
+| X-Ray Tracing |	✅ Yes |	❌ No |
+| Cost |	Higher |	Lower |
