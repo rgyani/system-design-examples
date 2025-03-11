@@ -73,3 +73,6 @@ On the server side, we can use the following components
 
 On the client side, we need to implement OT transformations hence the viewer/editor should use websockets to communicate with the backend
 
+
+[https://www.youtube.com/watch?v=YCjVIDv0zQY](https://www.youtube.com/watch?v=YCjVIDv0zQY)
+
