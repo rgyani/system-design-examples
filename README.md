@@ -111,6 +111,6 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design Online Gaming Backend](https://www.youtube.com/watch?v=K3Z1PY2vr3Q)
 * [Design Notification Service](https://www.youtube.com/watch?v=CUwt9_l0DOg)
 * [Design AirBnB](https://www.youtube.com/watch?v=YyOXt2MEkv4)
-* [Design Yelp] (https://www.youtube.com/watch?v=TCP5iPy8xqo)
+* [Design Yelp](https://www.youtube.com/watch?v=mMSJO4SrQLI)
 * [Design BookMyShow](https://www.youtube.com/watch?v=lBAwJgoO3Ek)
 * [Design Distributed JobSchedular](https://www.youtube.com/watch?v=WTxG5880EH8)
