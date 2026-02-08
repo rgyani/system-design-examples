@@ -33,8 +33,8 @@ Here we use ***WebSockets***, but the other available options could be
 
 ***WebSocket***: Websocket is a fully bi-directional connection, which means once a userA is connected to the server, both client and server can initiate a request. Websocket also has sticky session, which when used with load balancer helps the initial server only handle the response
 
-***SSE, or Server-Sent Events,*** allows the server to push updates to the client whenever it wants, without the client needing to make a request first. It’s as if the server says, "Here’s the data you need," and the client simply listens. Unlike WebSockets, where both parties can talk to each other, SSE is more like a one-way street.
-Connection establishment: The client sends a standard HTTP request with the Accept: text/event-stream header, signaling its desire for an SSE connection.
+***SSE, or Server-Sent Events,*** allows the server to push updates to the client whenever it wants, without the client needing to make a request first. It’s as if the server says, "Here’s the data you need," and the client simply listens. Unlike WebSockets, where both parties can talk to each other, SSE is more like a one-way street.  
+**Connection establishment:** The client sends a standard HTTP request with the *Accept: text/event-stream* header, signaling its desire for an SSE connection.
 
 ***BOSH***: Bidirectional Streams over Synchronous HTTP, which means once a userA sends a request to the server, the server holds on the request till certain time has passed or it has some new data, at which point it will send a response back
 
