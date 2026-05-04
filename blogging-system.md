@@ -20,37 +20,40 @@ Non-functional Requirements
 3. the platform should be scaled for 10,000 daily active writers
 4. Durable data, Strong consistency
 
-### Database
+### Why Not DynamoDB?
+DynamoDB was considered for its schemaless flexibility and guaranteed constant-time performance at scale. However, it has a critical weakness for this use case: it has no native search capability. To support fuzzy/full-text search, you would still need a separate OpenSearch/Elasticsearch cluster on top — which negates the main advantage of going NoSQL.  
+Additionally, a blogging platform has inherently relational data: users, posts, tags, and eventually comments, likes, and follows. DynamoDB forces rigid access pattern design upfront; a query like "all posts tagged 'python' by authors a user follows, sorted by likes" is natural in SQL and painful in DynamoDB.   
+Finally, the write scale is simply not demanding enough to justify it — 10K daily active writers is a modest load (~0.12 writes/second average), well within what a managed PostgreSQL cluster handles effortlessly.
 
-Thinking about data requirements, we can go for either SQL database or even a No-SQL database.
-Lets consider the pros and cons of both scenarios before honing in on one system
+### Why Not a Separate Elasticsearch/OpenSearch Cluster?
+A separate Elasticsearch cluster introduces significant operational complexity:
+* Two systems to keep in sync — every write must go to both the DB and the search index; a failed Lambda trigger or indexing delay causes inconsistency
+* Lambda cold starts add latency on every write path
+* Indexing lag — OpenSearch is not instantly consistent, so freshly published posts may not appear in search results immediately
+* Cost — running three separate AWS services (S3/DB + Lambda + OpenSearch) versus one
 
-For our use case 
-1. 10K daily active writers * 365 days * 10KB data per blog -> 34 GB of data per year
-    a. This can be handled by SQL also, and we dont need joins here, so the data can be sharded and scaled up
-2. For searching, we would need to support fuzzy search, hence **a separate ElasticSearch cluster** is essential
-3. For lookups based on userid-post date combination, there is a simple Query operation on the DB
-4. However, when we want to list all the blogs of a writer, we need to do Scan operations.
-   1. for this, in nosql DBs like DynamoDB, we can design the "posts" table, such that
-      * UserId is the primary key, and 
-      * DatePublished is a sort key
-   2. In SQL databases, we can have the "posts" table containing userid(FK), post_date, and content such that
-      * we can simply query over the posts table with userid in where clause.
-      * remember to add an index over the userid column in post table to improve query performance
-      * obviously with the scale of data we are talking about the performance of the index might be a constraint on the performance
+PostgreSQL's built-in full-text search (tsvector/tsquery) is sufficient for this scale. At 34 GB/year of text content (~10KB × 10K writers × 365 days), Postgres FTS handles millions of posts without breaking a sweat. A separate search cluster only becomes necessary beyond ~5–10M posts or when advanced requirements arise (semantic search, faceted filters, multi-language stemming at scale).
 
-I would bat for dynamoDB here, because of  
-1. the sheer flexibility of guaranteed constant performance even if the scale of data massively increases
-2. Schemaless: with sql database the schema has to be predetermined before implementation, eg  
-   1. the videos column:  
-      * Obviously,  videos and images would be stored in a CDN (eg. cloudfront in-front of a s3 bucket)    
-      *  However we might want to serve multi-resolution videos, based the reader device down the line.  
-      * For this we can simply add columns to the post table and the right columns containing the video location can be picked up by our api
-      * suppose tomorrow, we also support nintendo switch 2, then we could run a slow-processor on the videos and add a new column for the switch resolution
+**Chosen Approach: PostgreSQL**
 
+Data volume estimate: 10,000 writers/day × 365 days × 10KB per post ≈ 34 GB/year (text content only)  
+This is comfortably handled by a single managed Postgres cluster with read replicas.
 
-# APIs
+### Media (Images & Videos)
+Text content lives in the DB. Binary media is stored separately:
+* Images and videos → S3 bucket, served via CloudFront CDN
+* The posts table stores S3 URLs/keys, not the files themselves
+* Multi-resolution video variants (e.g., for different devices) can be handled by a background processor that writes new S3 keys; the posts table can be extended with additional columns (e.g., video_720p_url, video_1080p_url) without a schema migration headache, since adding nullable columns to Postgres is cheap
 
-* The API to fetch the data for a blog post is simple enough, as it involves a DB lookup
-* However the API to put a blog post can write entries to dynamoDB as well as the Elastic Search cluster
-* The API to search directly interacts with the Elastic Search cluster
+### Scaling & Read Performance
+1M readers/month (~0.4 reads/second average, ~50–100 req/s at peak) does not stress the database — because reads should rarely hit the DB at all.
+
+#### Read path:
+Reader → CloudFront (CDN) → ElastiCache (Redis) → Aurora Postgres (cache miss only)
+
+* CloudFront caches rendered blog pages at the edge; most reads never reach the origin
+* Redis caches DB query results (e.g., post content, author page listings) with a short TTL
+* DB only sees traffic on cache misses, keeping it nearly idle under normal load
+
+#### Write path:
+Writer → API → Aurora Postgres (content + search_vec updated atomically)
