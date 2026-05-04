@@ -82,3 +82,37 @@ ConditionExpression: "attribute_not_exists(Status) OR LockExpiresAt < :current_t
         * BookingID: Unique identifier for the booking.
 2. If the user fails to book:
     * Leave the system to auto-expire the lock based on LockExpiresAt.
+
+## Futher thoughts
+
+1. The "Data Freshness" vs. "Pre-computation" Dilemma
+
+    We discussed storing Pre-calculating paths in a Graph DB.
+
+    * **The Problem:** Airline prices and availability change every second. If you pre-calculate a "cheap" path, by the time the user clicks "Book," the seat might be gone or the price doubled.
+    * **The Fix:** Use a **Multi-Level Cache Strategy**.
+        * Level 1 (Graph DB): Static routes (e.g., London to NYC exists).
+        * Level 2 (In-memory Cache/Redis): Real-time availability and pricing for the next 24–48 hours, refreshed via a stream from the GDS (amadeus/sabre).
+        * Level 3 (Direct GDS Call): Only at the final step of the search or during the booking flow to ensure the price is "locked" with the airline.
+
+2. Handling Distributed Transactions (The Saga Pattern)  
+
+    In a microservices architecture, a failure in the Payment service after you’ve reserved the seat in DynamoDB creates a "zombie" reservation.
+
+    **We need a Saga Orchestrator**.
+
+    If the payment fails, the Saga must trigger a "compensating transaction" to release the DynamoDB lock and notify the user. Without this, our seat inventory will become inconsistent.
+
+3. Search Optimization: Read-Heavy Traffic
+
+    Flight searches are typically 1000x more frequent than actual bookings.
+
+    - **CQRS (Command Query Responsibility Segregation):** We strictly separate the "Search" (Read) side from the "Booking" (Write) side.
+    - **Aggregator Service:** Since we are pulling data from multiple airlines, we need an Aggregator Pattern to merge, de-duplicate, and sort results before they hit the Comparison Service.
+
+4. The "Thundering Herd" Problem
+    
+    When a deal goes viral (e.g., $200 flights to Hawaii), thousands of users might hit the same FlightID_DATETIME partition in DynamoDB simultaneously.
+
+    - **Potential Issue:** Even with Conditional Writes, you might hit partition throughput limits.
+    - **Optimization:** Implement Client-side Debouncing or a Request Queue (like SQS) to buffer the "Lock" requests if the system detects a massive spike for a specific flight.

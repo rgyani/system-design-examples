@@ -21,8 +21,11 @@ Non-functional Requirements
 4. Durable data, Strong consistency
 
 ### Why Not DynamoDB?
-DynamoDB was considered for its schemaless flexibility and guaranteed constant-time performance at scale. However, it has a critical weakness for this use case: it has no native search capability. To support fuzzy/full-text search, you would still need a separate OpenSearch/Elasticsearch cluster on top — which negates the main advantage of going NoSQL.  
+DynamoDB can be for its schemaless flexibility and guaranteed constant-time performance at scale. However, it has a critical weakness for this use case: it has no native search capability. 
+To support fuzzy/full-text search, you would still need a separate OpenSearch/Elasticsearch cluster on top — which negates the main advantage of going NoSQL.  
+
 Additionally, a blogging platform has inherently relational data: users, posts, tags, and eventually comments, likes, and follows. DynamoDB forces rigid access pattern design upfront; a query like "all posts tagged 'python' by authors a user follows, sorted by likes" is natural in SQL and painful in DynamoDB.   
+
 Finally, the write scale is simply not demanding enough to justify it — 10K daily active writers is a modest load (~0.12 writes/second average), well within what a managed PostgreSQL cluster handles effortlessly.
 
 ### Why Not a Separate Elasticsearch/OpenSearch Cluster?

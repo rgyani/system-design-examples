@@ -60,6 +60,11 @@ In the role-based access control data model, access can be limited to certain ac
 
 For such a system, we can use simple storage service like S3, where we have concepts like directories, files and owners.
 
+However, s3 while being great for cold storage is not ideal for a live collaborative editor  
+We need a NoSQL DB (like Cassandra or DynamoDB) to store the Edit Log (the history of OT operations).
+
+Periodically (e.g., every 50 operations), we collapse the edit log and save a "Snapshot" of the document to S3 or a Document DB (like MongoDB). When a user opens a doc, they load the last snapshot + any pending operations in the log.
+
 
 ### High-Level Design
 
