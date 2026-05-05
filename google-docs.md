@@ -78,6 +78,83 @@ On the server side, we can use the following components
 
 On the client side, we need to implement OT transformations hence the viewer/editor should use websockets to communicate with the backend
 
+![img](imgs/google_docs_architecture.svg)
 
-[https://www.youtube.com/watch?v=YCjVIDv0zQY](https://www.youtube.com/watch?v=YCjVIDv0zQY)
+### API Design
+REST endpoints (stateless, handled by the API gateway):
 
+| Method | Path | Description |
+|---|---|---|
+| POST  | /documents | Create a new document|
+| GET  |  /documents/:id | Fetch document metadata + latest snapshot|
+| DELETE | /documents/:id | Soft-delete a document|
+| GET | /folders/:id/documents | List documents in a folder|
+| POST | /documents/:id/permissions | Share with a user (grant role)|
+| DELETE | /documents/:id/permissions/:userId| Revoke access |
+
+
+### WebSocket protocol (handled by the collaboration service):
+```code
+Client → Server:  { type: "op",       docId, op: { type, pos, char }, revision }
+Client → Server:  { type: "cursor",   docId, position }
+Server → Client:  { type: "op",       op: <transformed_op>, revision }
+Server → Client:  { type: "presence", userId, cursor, color }
+Server → Client:  { type: "ack",      revision }
+```
+The revision field is the server-side operation counter. Every client tracks the last acknowledged revision and uses it to perform OT transforms before applying incoming ops.
+
+### Data Models
+
+**Document (PostgreSQL):**
+```sql
+documents(id UUID PK, owner_id UUID FK, folder_id UUID FK,
+          title TEXT, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ,
+          snapshot_revision INT, is_deleted BOOL)
+```
+
+**OT edit log (Cassandra — partition by doc_id, cluster by revision):**
+```code
+edit_log(doc_id UUID, revision INT, user_id UUID,
+         op_type TEXT,  -- "insert" | "delete"
+         position INT, character TEXT,
+         timestamp TIMESTAMPTZ,
+         PRIMARY KEY (doc_id, revision))
+```
+Cassandra is ideal here because it's append-only writes at high throughput, and you query by doc_id + revision_range — a perfect partition key pattern.
+
+**Snapshot (MongoDB):**
+```json
+{
+  "doc_id": "uuid",
+  "revision": 1250,
+  "content": "full document text",
+  "created_at": "ISO-8601"
+}
+```
+
+**Permissions (PostgreSQL):**
+```sql
+permissions(doc_id UUID, user_id UUID, role ENUM('owner','editor','commenter','viewer'),
+            granted_at TIMESTAMPTZ,
+            PRIMARY KEY (doc_id, user_id))
+```
+
+
+### Scalability Design
+**To hit 5M users / 10K concurrent writers:**
+1. **Horizontal scaling of stateless services.** The auth, document, and permission services are fully stateless behind the API gateway — scale them with auto-scaling groups behind a load balancer. Each pod reads from read replicas; writes go to the primary.
+2. **WebSocket stickiness.** WebSocket connections are stateful by nature. You route each connection to a dedicated collaboration service pod using consistent hashing on doc_id. All pods subscribe to the Kafka topic for their assigned docs, so an op written by one client is published to Kafka and fanned out to all other pods serving that document's other connected clients.
+3. **Redis for hot state.** The last ~50 operations per active document are cached in Redis. When a new client connects mid-session, they fetch the latest snapshot from MongoDB, then replay only the Redis-cached ops rather than replaying thousands of Cassandra rows.
+4. **Read scaling.** The document metadata store (PostgreSQL) uses a primary + read replica topology. Most reads (opening a doc, listing folders) go to read replicas. Snapshot reads hit MongoDB, which scales horizontally with sharding by doc_id.
+4. **Snapshot compaction.** A background worker watches Cassandra. Every 50 operations, it collapses the edit log into a new snapshot in MongoDB and updates snapshot_revision in PostgreSQL. This bounds the cold-start replay time to at most 50 ops.
+
+### Fault Tolerance & Edge Cases
+1. **Client disconnect mid-edit.** The client buffers any unacknowledged ops locally. On reconnect, it re-sends them with the last known revision. The server re-applies OT from that revision and returns the transformed ops.
+2. **OT conflict ceiling.** OT only commutes correctly for simple insert/delete. For richer content (tables, images, embedded objects), you need CRDTs (like Yjs or Automerge) or a server-authoritative model where every op is serialized through a single leader for that document.  
+The document design here uses a single collaboration service pod per document (via consistent hashing), making the server the authority — this avoids the hardest distributed OT edge cases.  
+3. **Partition tolerance.** If the collaboration pod for a document crashes, the consistent-hash router reassigns the doc to another pod. Clients reconnect automatically (WebSocket reconnect logic), re-fetch the latest snapshot + pending ops from Redis/Cassandra, and resume. No writes are lost because ops are written to Cassandra before the ack is sent to the client.
+4. **Presence expiry.** Cursor presence is stored in Redis with a TTL (e.g. 10s). The client sends a heartbeat every 5s. If the TTL expires (client disconnected without a clean close), the server broadcasts a presence:leave event to other clients.
+
+### Caching & CDN Strategy
+- Static assets (the editor JS bundle, fonts, icons) are served via a CDN (CloudFront / Fastly) with long-lived cache headers. Document content itself is never cached at the CDN layer since it's user-specific and changes frequently.
+- For the API layer, you cache two things in Redis: the latest snapshot reference ```(doc_id → {snapshot_id, revision})``` and the permission lookup ```(user_id + doc_id → role)```. The permission cache is invalided on every ```POST /permissions``` write. This removes the two most common DB reads — snapshot lookup on open, and ACL check on every op — from the critical path entirely.
