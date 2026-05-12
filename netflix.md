@@ -1,9 +1,4 @@
-# Netflix/Youtube System Design
-
-Netflix needs no introductory trailer.
-Lets jump into the design
-
-
+# Netflix System Design
 
 ### Functional and Non-functional Requirements
 
@@ -16,7 +11,7 @@ Functional Requirements
 Non-Functional Requirements
 1. Low latency
 2. High availability
-3. Highly consistent
+3. Eventually consistent, a user might see a slightly different "Continue Watching" timestamp than they saw on their tablet five minutes ago
 4. Highly scalable
 
 ### Lets talk CDN
@@ -37,6 +32,12 @@ These NoSQL databases would be replicated across regions, and could also have so
 Once a title is selected, we identify the best suitable video format and redirect the user to nearest **CDN location** to stream the content.
 
 While the content is being played on the user's device, the app will periodically send the current video's time to the server in order to provide the ability to Continue Watching
+
+### The Transcoding Pipeline
+Netflix doesn't just store one "1080p" file. They use Adaptive Bitrate Streaming (ABR).
+* **The Process:** A single movie is broken into thousands of chunks (e.g., 2-5 seconds each).
+* **The Matrix:** Each chunk is encoded into dozens of combinations of resolution (4k, 1080p, 720p) and codecs (HEVC, VP9, AVC) for different devices.
+* **The Manifest File:** When a user clicks "Play," they don't get a video file; they get a Manifest File (.m3u8 or .mpd) that tells the player which chunks to download from the CDN based on current network speed.
 
 
 ### Health Management
@@ -67,6 +68,15 @@ We could have a **NoSQL database** containing all the Titles Available, and a **
 
 The Home Page service queries this database behind a load balancer.
 
+### User Management Service
+**CockroachDB or Aurora:** For transactional data that must be consistent (Billing, User Subscriptions, and Login credentials).
+
+### Microservices & Resiliency
+Netflix is the poster child for **Chaos Engineering**.  
+Netflix used Circuit Breakers (e.g., Resilience4j): If the "Recommendation Service" is down, the "Home Page Service" shouldn't crash; it should just show a generic "Trending Now" list instead.
+
+### Playback Error Handling
+Real-time Telemetry: The client app doesn't just send errors; it sends a "heartbeat" every few seconds. If the "buffer health" on the client side drops, the system can preemptively switch the CDN source or lower the bitrate before the user even sees a spinning loading circle.
 
 **Kafka acts as a Service Bus**, connecting the Ingestion Service with the Movies master NoSQL Database acting as a consumer
 The Users activity also goes into the Kafka SOA, and can be picked by Spark Analytics Pipeline
