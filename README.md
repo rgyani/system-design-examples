@@ -106,7 +106,7 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design an API rate limiter](api-rate-limiter.md)
 * [Design Pastebin](pastebin.md)
 * [Design web-crawler](web-crawler.md)
-* [Design Stack Overflow](https://www.youtube.com/watch?v=k4xr-UHfWtM)
+* [Design Stack Overflow](stackoverflow.md)
 * [Design Autocomplete or Typeahead Suggestions](https://www.youtube.com/watch?v=us0qySiUsGU)
 * [Design a Vending Machine](https://www.youtube.com/watch?v=D0kDMUgo27c)
 * [Design Online Gaming Backend](https://www.youtube.com/watch?v=K3Z1PY2vr3Q)
