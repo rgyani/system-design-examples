@@ -90,6 +90,7 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design Uber](uber.md)
 * [Design Netflix](netflix.md)
 * [Design YouTube](youtube.md)
+* [Design Instagram](instagram.md)
 * [Design Cricinfo](cricinfo.md)
 * [Design Ticket Booking with Virtual Waiting Rooms](virtual-waiting-room.md)
 * [Design Payment System](https://newsletter.pragmaticengineer.com/p/designing-a-payment-system?s=r)
