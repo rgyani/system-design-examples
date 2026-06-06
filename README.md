@@ -93,7 +93,7 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design Instagram](instagram.md)
 * [Design Cricinfo](cricinfo.md)
 * [Design Ticket Booking with Virtual Waiting Rooms](virtual-waiting-room.md)
-* [Design Payment System](https://newsletter.pragmaticengineer.com/p/designing-a-payment-system?s=r)
+* [Design Payment System](payment-system.md)
 * [Design Hotel Booking System](hotel-booking.md)
 * [Design Stock Exchange](stock-exchange.md)
 * [Design Zoom](https://www.codekarle.com/system-design/Zoom-system-design.html)
