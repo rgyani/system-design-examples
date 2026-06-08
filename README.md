@@ -107,6 +107,8 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design Pastebin](pastebin.md)
 * [Design web-crawler](web-crawler.md)
 * [Design Stack Overflow](stackoverflow.md)
+* [Design Distributed JobSchedular](distributed-job-schedular.md)
+
 * [Design Autocomplete or Typeahead Suggestions](https://www.youtube.com/watch?v=us0qySiUsGU)
 * [Design a Vending Machine](https://www.youtube.com/watch?v=D0kDMUgo27c)
 * [Design Online Gaming Backend](https://www.youtube.com/watch?v=K3Z1PY2vr3Q)
@@ -114,6 +116,5 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design AirBnB](https://www.youtube.com/watch?v=YyOXt2MEkv4)
 * [Design Yelp](https://www.youtube.com/watch?v=mMSJO4SrQLI)
 * [Design BookMyShow](https://www.youtube.com/watch?v=lBAwJgoO3Ek)
-* [Design Distributed JobSchedular](https://www.youtube.com/watch?v=WTxG5880EH8)
 * [Git Internals](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
 * [Deploy a WordPress Website](https://github.com/acantril/learn-cantrill-io-labs/tree/master/aws-elastic-wordpress-evolution)
