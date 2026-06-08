@@ -82,6 +82,7 @@ This model includes:
 Here are some examples of how you can design the following systems, based on my understanding only:
 
 * [Design a Tiny URL](tinyurl.md)
+* [Design an OTP Service](otp-service.md)
 * [Design Whatsapp](whatsapp.md)
 * [Design Twitter](twitter.md)
 * [Design Google Maps](google-maps.md)
