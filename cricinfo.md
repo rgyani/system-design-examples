@@ -86,6 +86,8 @@ Strategies:
 * **Queue-based fan-out:** Kafka consumers distribute live updates; don't hammer DB directly
 
 ## Live Update Flow (Ball-by-Ball)
+
+```
 Official Feed → Ingestion Service → Kafka Topic: "live-balls"
                                           ↓
                               Score Processor (consumer)
@@ -96,6 +98,7 @@ Official Feed → Ingestion Service → Kafka Topic: "live-balls"
                     WebSocket Server
                            ↓
                     Push to all subscribed clients
+```
 
 ### CDN & Caching Strategy
 | Content Type | Cache Duration| Strategy|
