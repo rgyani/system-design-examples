@@ -24,7 +24,8 @@ Now lets draw boxes
 3. Idempotency Check: It attempts to acquire a lock in Redis using idempotency_key.
 4. If it exists, return the in-flight status or cached response.
 5. If not, proceed to create Intent 
-6. Create a record in the Primary DB with status INITIATED and write a corresponding event to the Outbox Table in the same DB transaction.
+6. **Create a record in the Primary DB with status INITIATED and write a corresponding event to the Outbox Table in the same DB transaction.**
+  * Same Transcation is critical here, since if one of the two requests fail, the transaction should be rolled back
 
 ### Step 2: Processing (The Async Handshake)
 1. A CDC engine (like Debezium) reads the Outbox table and pushes the PaymentIntent to the Payment Request Stream.
