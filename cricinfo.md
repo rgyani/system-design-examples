@@ -101,8 +101,9 @@ Official Feed → Ingestion Service → Kafka Topic: "live-balls"
 ```
 
 ### CDN & Caching Strategy
+
 | Content Type | Cache Duration| Strategy|
-|---|---|
+|---|---|---|
 |Live scorecard| 5–15 seconds | CDN edge with short TTL|
 | Historical scorecards| 1 year| Immutable, long TTL|
 | Player profile stats| 1 hour| CDN + Redis|
