@@ -108,7 +108,6 @@ Here are some examples of how you can design the following systems, based on my 
 * [Design web-crawler](web-crawler.md)
 * [Design Stack Overflow](stackoverflow.md)
 * [Design Distributed JobSchedular](distributed-job-schedular.md)
-
 * [Design Autocomplete or Typeahead Suggestions](https://www.youtube.com/watch?v=us0qySiUsGU)
 * [Design a Vending Machine](https://www.youtube.com/watch?v=D0kDMUgo27c)
 * [Design Online Gaming Backend](https://www.youtube.com/watch?v=K3Z1PY2vr3Q)
