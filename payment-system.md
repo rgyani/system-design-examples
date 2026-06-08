@@ -42,7 +42,8 @@ Now lets draw boxes
 
 ### Database
 I would use relational database with strict ACID guarantees for the Ledger.   
-Never use a pure NoSQL database for account balances unless it has robust multi-row transaction support.
+Never use a pure NoSQL database for account balances unless it has robust multi-row transaction support.  
+FYI, DynamodB does support 100 action request in a single transaction, across multuple tables 
 
 ### Double-Entry Ledger
 In a payment system, **you can never rely on a single database column like user_balance = user_balance - 10.**   
