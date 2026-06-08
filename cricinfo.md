@@ -23,6 +23,7 @@
 | Live update frequency| Every ball (~30s intervals) |
 
 ### High-Level Architecture
+```
 Users → CDN → Load Balancer → API Gateway
                                     ↓
               ┌─────────────────────────────────────┐
@@ -35,6 +36,7 @@ Users → CDN → Load Balancer → API Gateway
                 ↓                 Cassandra)
               Cache Layer
               (Redis)
+```
 
 #### Live Score Service
 * **Data ingestion:** Official scorer feeds (ESPNcricinfo uses official ICC/board feeds via proprietary APIs)
