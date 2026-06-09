@@ -105,3 +105,46 @@ A skiplist structure will:
 To better understand the concept, read here  
 https://jothipn.github.io/2023/04/07/redis-sorted-set.html#determining-the-random-level
 
+
+
+## Redis Cluster
+
+When your dataset grows so large that it can no longer fit into the RAM of a single physical server, Redis Cluster allows you to scale out horizontally by breaking that massive dataset into smaller chunks (shards) and spreading them across multiple machines.  However, Redis Cluster doesn't just do raw sharding; it implements it in a very specific way using Hash Slots and combines it with High Availability.  
+
+### 1. How Redis Cluster Shards: The 16,384 Hash Slots
+Unlike some databases that use "consistent hashing" or shard by ranges (like A–M go to Node 1, N–Z go to Node 2), Redis Cluster uses a concept called Hash Slots.  
+* There are **always exactly 16,384 hash slots** in a Redis Cluster.  
+* When you set up a cluster, these 16,384 slots are divided up among your master nodes. 
+
+For example, if you have 3 master nodes:
+* Node A gets slots 0 to 5460
+* Node B gets slots 5461 to 10922
+* Node C gets slots 10923 to 16383
+
+### How a key finds its home:
+Every time you run a command like *SET user:100 "John"*, Redis figures out which server owns that data using a deterministic formula:$$\text{Slot} = \text{CRC16}(\text{"user:100"}) \pmod{16384}$$
+
+Because the formula is deterministic, the key "user:100" will always map to the exact same slot number, and therefore the exact same shard.
+
+### 2. Why use "Slots" instead of direct sharding?
+Using fixed slots makes resharding (scaling up or down) incredibly easy and seamless. 
+
+If you run out of space on your 3 nodes and add a Node D, Redis doesn't have to scramble all your data. It simply moves a few thousand slots from Nodes A, B, and C over to Node D. 
+
+While those slots are moving, the rest of the cluster stays fully online and continues serving traffic.  
+
+### 3. The Other Half: High Availability (Failover)
+If you only shard your data and Node B dies, you instantly lose 1/3 of your database. To prevent this, a Redis Cluster enforces a Master-Replica model for every shard.  
+
+Each master node gets one or more replica (slave) nodes that copy its data asynchronously.  
+* If Node B (Master) crashes, the remaining nodes hold an election via a cluster bus protocol.  
+* They automatically promote Node B1 (Replica) to become the new Master.  
+* The cluster updates its internal map to say "Node B1 now owns slots 5461 to 10922," and your application keeps running without missing a beat.
+
+### Summary of the Scaling Strategies  
+To keep things clear, it helps to look at the different ways Redis scales:
+
+|Strategy |What it's for| How it works|
+|---|---|---|
+|Sentinel / Basic Replication| High Availability & Read Scalability | One master handles all writes and replicates data to multiple clones. If master dies, Sentinel promotes a replica. Dataset must still fit on one machine.|
+| Redis Cluster | Write Scalability & Data Volume Scalability | Data is split across multiple masters using 16,384 hash slots. Each master has its own replicas. Dataset can scale infinitely across machines.|
